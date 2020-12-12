@@ -252,6 +252,7 @@ export default class WordForm extends Component {
               <tr>
                 <td className="tdword">{item.name}</td>
                 <td className="tdsuggest">   
+                 {item.suggestion}
                </td>
                 <td className="tdbutton">     
                 <button className="btn btn-secondary mr-2 Buttonstyle" onClick={() => this.openmodal(item)}>

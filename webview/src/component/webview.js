@@ -1,10 +1,9 @@
 import React, { Component } from "react";
-import {MDBProgress} from "mdbreact";
 import axios from "axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck,faTimes,faPlus,faTrash } from '@fortawesome/free-solid-svg-icons';
-import { Pagination } from 'react-bootstrap';
-
+import { Progress } from 'reactstrap';
+import Pagination from './pagination'
 export default class WebView extends Component {
   constructor(props) {
         super(props);
@@ -14,7 +13,7 @@ export default class WebView extends Component {
           current: 0,
           active:false,
           pagination:1,
-          sumofpages:1,
+          sumofpages:0,
           PageList:[],
           isdone:false,
           working:'',
@@ -29,6 +28,13 @@ export default class WebView extends Component {
   componentDidMount() {
     this.refreshList();
   }
+  changepage=(i)=>{
+    this.setState({pagination:i},()=>{
+      console.log(this.state.pagination)
+      this.poll()
+     }
+    )
+  }
   refreshList = () => {
     axios
       .get("/get_view/"+this.getAllUrlParams().id)
@@ -40,6 +46,7 @@ export default class WebView extends Component {
            this.setState({active:false})
            this.StopPoll()
           }
+          
         }
         else
         {
@@ -201,6 +208,7 @@ export default class WebView extends Component {
     console.log(clickValue);
     this.setState({pagination:clickValue},this.poll);
   }
+
   paginationBasic=() => {
     let items = [];
     for (let number = 1; number <= this.state.sumofpages; number++) {
@@ -225,11 +233,11 @@ export default class WebView extends Component {
         <div>    
         <div>{this.state.page}</div>
         <div className="process">
-          <MDBProgress value={this.state.current} className="my-2" />
+          <Progress value={this.state.current}/>
         </div>
          </div>):null
         }
-        <table>
+        <table className="containTable">
            <tr>
            <th>Pages</th>
            <th>State</th>
@@ -237,7 +245,11 @@ export default class WebView extends Component {
           </tr>
           {this.renderItems()}
         </table> 
-         {this.paginationBasic()}
+        {
+          this.state.sumofpages!=0 ?(
+              <Pagination items={[]} current={this.state.pagination} sumofpages={this.state.sumofpages} changepagefunc={this.changepage}/>
+          ):null
+        }   
       </div> 
       )
   }

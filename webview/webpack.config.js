@@ -3,7 +3,7 @@ const webpack = require('webpack')
 module.exports = { 
   entry: './src/index.js',
   output: {
-    path: path.resolve(__dirname, 'build'),
+    path: __dirname+'/../../../Desktop/pythonproject/urlpage/static/reactjs/',
     filename: 'webview.bundle.js'
   },  
   module: {
