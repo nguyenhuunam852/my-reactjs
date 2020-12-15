@@ -208,23 +208,7 @@ export default class WebView extends Component {
     console.log(clickValue);
     this.setState({pagination:clickValue},this.poll);
   }
-
-  paginationBasic=() => {
-    let items = [];
-    for (let number = 1; number <= this.state.sumofpages; number++) {
-     items.push(
-       <Pagination.Item key={number} data-page={number} active={number == this.state.pagination}>
-       {number}
-       </Pagination.Item>,
-     );
-    }
-    return(
-      <div>
-         <br/>
-         <Pagination size="sm" onClick={this.handleClick}>{items}</Pagination>
-      </div>
-   );
-  }    
+ 
   render(){
       return (
       <div>

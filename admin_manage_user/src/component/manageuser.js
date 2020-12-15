@@ -214,6 +214,12 @@ export default class ManageUser extends Component {
   active_add = () => {
 
   }
+  changepage=(i)=>{
+    this.setState({pagination:i},()=>{
+      this.refreshList();
+     }
+    )
+  }
   render() {
     return (
       <div style={{ width: "100%" }}>
