@@ -4,67 +4,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { Button } from 'reactstrap'
 
-export default class ManageLibWord extends Component {
+export default class ManageIgnoreWord extends Component {
   constructor(props) {
     super(props);
     this.state =
     {
       pagination: 1,
       sumofpages: 0,
-      wordItem: [],
-      selectedFile: null,
-      add:false
+      wordItem: []
     };
 
   }
-  onFileChange = (event) => { 
-    // Update the state 
-    this.setState({ selectedFile: event.target.files[0] }); 
-  }; 
-  onFileUpload = () => {      
-    const formData = new FormData(); 
-    formData.append( 
-      "myFile", 
-      this.state.selectedFile, 
-      this.state.selectedFile.name 
-    ); 
-   
-    var csrftoken = this.getCookie('csrftoken');
-    axios.post("/admin/uploadfile", formData, {
-        headers: {
-          'X-CSRFTOKEN': csrftoken
-        }
-      }).then(res=>{
-        if(res.data.signal==='Success')
-        {
-          alert('Your task is done!');
-          this.refreshList();
-        }
-        else
-        {
-          alert('Your task fail!');
-          this.refreshList();
-        }
-      }); 
-  }; 
-  fileData = () => { 
-    if (this.state.selectedFile) { 
-      return ( 
-        <div> 
-          <h2>File Details:</h2> 
-          <p>File Name: {this.state.selectedFile.name}</p> 
-          <p>File Type: {this.state.selectedFile.type}</p> 
-        </div> 
-      ); 
-    } else { 
-      return ( 
-        <div> 
-          <br /> 
-          <h4>Choose before Pressing the Upload button</h4> 
-        </div> 
-      ); 
-    } 
-  }; 
   componentDidMount() {
     this.refreshList();
   }
@@ -108,8 +58,8 @@ export default class ManageLibWord extends Component {
 
   refreshList = () => {
     axios
-      .get("/admin/get_libinfor?page=" + this.state.pagination)
-      .then(res => this.setState({ wordItem: res.data.items, sumofpages: res.data.sumofpages,selectedFile:null}))
+      .get("/admin/getignoreinfor?page=" + this.state.pagination)
+      .then(res => this.setState({ wordItem: res.data.items, sumofpages: res.data.sumofpages}))
       .catch(err => console.log(err));
   };
   getCookie = (name) => {
@@ -137,7 +87,6 @@ export default class ManageLibWord extends Component {
     return this.state.wordItem.map(item => (
       <tr>
         <td>{item.name}</td>
-        <td>{item.f_user.email}</td>
         <td>
           {item.created_at}
         </td>
@@ -152,17 +101,8 @@ export default class ManageLibWord extends Component {
   render() {
     return (
       <div style={{ width: "100%" }}>
-          <br/>
-          <br/>
-          {
-          this.state.add == false ?
-          (
+        <br/>
         <div>
-          <div class="row justify-content-md-center">   
-             <div id="buttonleft">
-              <Button color="success" onClick={() => { this.setState({add:true}) }}><FontAwesomeIcon icon={faPlus} /> </Button>
-             </div> 
-          </div>
           <br/>
           <br/>
           <div class="row justify-content-md-center">     
@@ -170,7 +110,6 @@ export default class ManageLibWord extends Component {
             <table className="tables">
               <tr>
                 <th>Word</th>
-                <th>Add_user</th>
                 <th>Create_at</th>
                 <th>Action</th>
               </tr>
@@ -187,31 +126,7 @@ export default class ManageLibWord extends Component {
         </div> 
          </div>
         </div>
-        </div>):(
-        <div>
-           <div class="row justify-content-md-center"> 
-           <div id="buttonleft">
-              <Button color="danger" onClick={() => { this.setState({add:false}) }}><FontAwesomeIcon icon={faPlus} /> </Button>
-           </div> 
-
-           </div>
-            <div class="row justify-content-md-center"> 
-              <div> 
-                <input type="file" onChange={this.onFileChange} /> 
-                <button onClick={this.onFileUpload}> 
-                     Upload! 
-                </button> 
-                <br/>
-                {this.fileData()} 
-              </div> 
-              
-            </div>
-          </div>
-          )
-      
-          }
-    </div>
-    
-        )
+        </div>
+    </div>)
   }
 }

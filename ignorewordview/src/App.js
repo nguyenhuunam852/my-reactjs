@@ -1,10 +1,10 @@
-import WebView  from './component/manageword.js'
+import ManageIgnoreWord   from './component/manageignoreword.js'
 
 function App() {
   return (
     <div className="App">
       <div> 
-         <ManageLibWord />
+         <ManageIgnoreWord  />
       </div>
     </div>
   );

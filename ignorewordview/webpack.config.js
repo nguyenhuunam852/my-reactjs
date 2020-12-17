@@ -3,8 +3,8 @@ const webpack = require('webpack')
 module.exports = { 
   entry: './src/index.js',
   output: {
-    path: __dirname+'/../../../Desktop/pythonproject/urlpage/static/reactjs/',
-    filename: 'wordview1.bundle.js'
+    path: __dirname+'/../../pythonproject/urlpage/static/reactjs/',
+    filename: 'ignoreword.bundle.js'
   },  
   module: {
     rules: [
