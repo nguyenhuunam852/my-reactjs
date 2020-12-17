@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck,faTimes,faPlus,faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faCheck,faTimes,faPlus,faTrash,faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 import { Progress } from 'reactstrap';
 import Pagination from './pagination'
 export default class WebView extends Component {
@@ -17,6 +17,7 @@ export default class WebView extends Component {
           PageList:[],
           isdone:false,
           working:'',
+          pending:false,
           interval:
             setInterval(()=>{
             this.poll()
@@ -36,8 +37,9 @@ export default class WebView extends Component {
     )
   }
   refreshList = () => {
+    console.log(this.state.pagination)
     axios
-      .get("/get_view/"+this.getAllUrlParams().id)
+      .get("/get_view/"+this.getAllUrlParams().id+"?pagi="+this.state.pagination)
       .then(res => this.setState({ PageList:res.data.items,sumofpages:res.data.sumofpages,isdone:res.data.isdone,working:res.data.state},()=>{
         if(this.state.isdone)
         {
@@ -50,16 +52,16 @@ export default class WebView extends Component {
         }
         else
         {
-          console.log(this.state.working)
-          if(this.state.working.trim()==='n-active')
-          {
-           this.setState({active:false})
-           this.StopPoll()
-          }
-          else
-          {
-           this.setState({active:true,current:res.data.process_percent,page:res.data.current_web}) 
-          }     
+          console.log(res.data.signal)
+            if(res.data.signal!='Pending' && res.data.signal!='Wait')
+           {
+            console.log('wtf')
+             this.setState({active:true,current:res.data.process_percent,page:res.data.current_web,pending:false}) 
+           }
+           if(res.data.signal=='Pending'){
+            this.setState({pending:true});
+           }  
+
         }
       }))
       .catch(err => console.log(err));
@@ -115,14 +117,13 @@ export default class WebView extends Component {
           </td>
         <td>
         {
-          item.is_done == true ? (
-          
+          item.is_valid == true ? (
           <div>
           <a className="stylebutton button" href={"/words?id=" + item.id}> <FontAwesomeIcon icon={faPlus} /></a>
           <a className="stylebutton1 button" href={"/words/" + item.id}> <FontAwesomeIcon icon={faTrash} /></a>
           </div> 
           ):(
-          <a className="stylebutton button" onClick={()=>{this.reloadpage(item.id)}}> <FontAwesomeIcon icon={faPlus} /></a>
+          <a className="stylebutton2 button" onClick={()=>{this.reloadpage(item.id)}}> <FontAwesomeIcon icon={faSyncAlt} /></a>
           )
         }
         </td>
@@ -141,7 +142,16 @@ export default class WebView extends Component {
         }
       }
     ).then(res => {
-
+        if(res.data.signal==='done')
+        {
+          alert('your task is done');
+          this.refreshList();
+        }
+        else
+        {
+          alert('something when wrong');
+          this.refreshList();
+        }
     }).catch(err => console.log(err));
   }
   StopPoll= ()=> {
@@ -170,16 +180,14 @@ export default class WebView extends Component {
           }
           else
           {
-            if(this.state.working==='n-active')
-            {
-             this.setState({active:false})
-             this.StopPoll()
-            }
-            else
-            {
-              console.log(this.state.current)
-             this.setState({active:true,current:res.data.process_percent,page:res.data.current_web})
-            }      
+            console.log(res.data.signal)
+            if(res.data.signal!='Pending' && res.data.signal!='Wait')
+           {
+             this.setState({active:true,current:res.data.process_percent,page:res.data.current_web,pending:false}) 
+           }
+           else{
+            this.setState({pending:true});
+           }  
           }
         })
     }).catch(err => console.log(err));
@@ -214,12 +222,26 @@ export default class WebView extends Component {
       <div>
         {
          this.state.active==true ? (
-        <div>    
-        <div>{this.state.page}</div>
-        <div className="process">
-          <Progress value={this.state.current}/>
-        </div>
-         </div>):null
+        <div>  
+        <div>{this.state.current}%</div>
+            <div className="process">
+            <Progress value={this.state.current}/>
+        </div>  
+        <br/>
+        </div>):(
+          <div>
+          {
+            console.log(this.state.pending),
+            this.state.pending==false ?(
+            <div>
+              
+            </div>
+            ):(
+              <div><h2>This Task is Pending because the server is overloading,pls wait a minute</h2></div>
+            )
+          }
+          </div>
+        )
         }
         <table className="containTable">
            <tr>
