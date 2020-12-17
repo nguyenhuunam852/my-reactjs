@@ -3,6 +3,8 @@ import axios from "axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { Button } from 'reactstrap'
+import Pagination from './pagination.js'
+
 
 export default class ManageIgnoreWord extends Component {
   constructor(props) {
@@ -58,10 +60,11 @@ export default class ManageIgnoreWord extends Component {
 
   refreshList = () => {
     axios
-      .get("/admin/getignoreinfor?page=" + this.state.pagination)
+      .get("/account/getignoreinfor?page=" + this.state.pagination)
       .then(res => this.setState({ wordItem: res.data.items, sumofpages: res.data.sumofpages}))
       .catch(err => console.log(err));
   };
+
   getCookie = (name) => {
     var cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -83,15 +86,33 @@ export default class ManageIgnoreWord extends Component {
      }
     )
   }
+  removeword=(id)=>{
+    var csrftoken = this.getCookie('csrftoken');
+    axios
+    .post("/account/removeword",{idword:id},{headers: {'X-CSRFTOKEN': csrftoken}}).then(res => {
+          if(res.data.signal==='done')
+          {
+            alert('your task is done')
+            this.refreshList()
+          }
+          else{
+            alert('something When Wrong')
+            this.refreshList();
+          }
+      })
+      .catch(err => console.log(err))
+  }
   renderItems = () => {
+    console.log(this.state.wordItem)
+
     return this.state.wordItem.map(item => (
       <tr>
-        <td>{item.name}</td>
+        <td>{item.word.name}</td>
         <td>
-          {item.created_at}
+          {item.verify}
         </td>
         <td>
-         <a style={{ color: "blue" }}> <FontAwesomeIcon icon={faTimes} /></a>
+         <a style={{ color: "blue" }} onClick={()=>{this.removeword(item.word.id)}} > <FontAwesomeIcon icon={faTimes} /></a>
         </td>
       </tr>
     )
