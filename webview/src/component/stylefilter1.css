@@ -1,12 +1,32 @@
-.breadcrumbs {
-    padding: 24px;
-}
+
 .breadcrumbs {
     font-size: .9rem;
     padding: 6px 24px;
 }
-.breadcrumbs {
-    font-size: .9rem;
+.breadcrumb::after {
+    background-size: auto;
+    background-size: 12px;
+    content: ".";
+    height: 12px;
+    margin: 0 5px;
+    transform: rotate(90deg);
+    width: 12px;
+}
+h4, h5, li, ol[class], p, ul[class] {
+   margin: 0;
+}
+*, ::after, ::before {
+    box-sizing: border-box;
+}
+.breadcrumb::after {
+    display: inline-block;
+}
+.breadcrumb{
+    background-color: white;
+}
+.breadcrumbs a {
+    display: flex;
+    align-items: center;
 }
 .breadcrumbs li {
     display: inline-flex;
@@ -24,23 +44,17 @@
     position: inherit !important;
     width: inherit;
 }
-a:link, a:visited {
-    color: #00458b;
-    text-decoration: none;
-}
-.breadcrumbs a {
-    display: flex;
-    align-items: center;
-}
-a:link, a:visited {
-    color: #00458b;
-    text-decoration: none;
-}
-.breadcrumb-container {
-    flex-basis: 70%;
-}
 .breadcrumbs ol {
     list-style: none;
     margin: 0;
     padding: 0;
+}
+
+.breadcrumbs a {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb-container {
+    flex-basis: 70%;
 }

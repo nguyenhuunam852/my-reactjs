@@ -11,7 +11,7 @@ export default class PictureZoomBox extends Component {
           width:this.props.size[0]+"px",
           height:this.props.size[1]+"px",
           smallwidth:this.props.size[0]*0.02+"px",
-          smallheight:this.props.size[1]*0.02+"px",
+          smallheight:this.props.size[1]*0.05+"px",
 
         };
         console.log(this.state)
@@ -30,9 +30,9 @@ export default class PictureZoomBox extends Component {
         img.parentElement.insertBefore(lens, img);
 
         cx = result.offsetWidth / lens.offsetWidth;
-
+        result.style.removeProperty("backgroundImage");
         result.style.backgroundImage = "url('"+ img.src + "')";
-        result.style.backgroundSize = (img.offsetWidth/0.02) + "px " + (img.offsetHeight/0.02) + "px";
+        result.style.backgroundSize = (img.offsetWidth/0.02) + "px " + (img.offsetHeight/0.05) + "px";
         
         lens.addEventListener("mousemove", moveLens);
         img.addEventListener("mousemove", moveLens);
@@ -85,6 +85,7 @@ export default class PictureZoomBox extends Component {
         }
     }
     componentDidMount(){
+        console.log(1)
         this.imagezoom("myimage", "myresult");
     }
   

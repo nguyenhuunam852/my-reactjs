@@ -197,6 +197,7 @@ export default class WordForm extends Component {
           }
         )
           .then(res => {
+          
              this.setState({src:res.data.pic,size:res.data.size},()=>{
                if(this.state.src!="fail.jpeg")
                { 
@@ -208,10 +209,39 @@ export default class WordForm extends Component {
                  this.setState({picbox:false,wait:false})
                }
              })
-            }
-           )
+           
+          })
           .catch(err => console.log(err))})
       }
+      poll1 = () => {
+        var csrftoken = this.getCookie('csrftoken');
+        this.setState({src:'',picbox:false,wait:true},()=>{
+          axios
+          .post("/analyze_pic_again",{
+             idpage:this.getAllUrlParams().id
+          },{
+            headers: {
+            'X-CSRFTOKEN': csrftoken
+            }
+            }
+          )
+            .then(res => {
+               this.setState({size:res.data.size},()=>{
+                 if(this.state.src!="fail.jpeg")
+                 { 
+                  this.setState({picbox:true,wait:false,src:res.data.pic})
+                 
+                 }
+                 else
+                 {
+                   alert("This Website can't be capture");
+                   this.setState({picbox:false,wait:false})
+                 }
+               })
+             
+            })
+            .catch(err => console.log(err))})
+        }
     hide=()=>{
       this.setState({picbox:false})
     }
@@ -280,29 +310,31 @@ export default class WordForm extends Component {
     render()
     {
       document.getElementsByTagName('nav')[0].style.display='flex';
-      document.getElementsByClassName('test')[0].style.display='block';
+      //document.getElementsByClassName('test')[0].style.display='block';
       return (
         
         <main className={this.state.wait==true || this.state.picbox==true  ? "blackform mainForm":"whiteform mainForm"}>
             {this.state.picbox==false && this.state.wait == true ? ( 
             <div>
             {
-                document.getElementsByTagName('nav')[0].style.setProperty('display','none'),
-                document.getElementsByClassName('test')[0].style.setProperty('display','none')
-            }  
-            <Spinner style={{ width: '3rem',color:"light", height: '3rem',left:'50%',right:'50%' }} />{' '}
+                document.getElementsByTagName('nav')[0].style.setProperty('display','none')
+                //document.getElementsByClassName('test')[0].style.setProperty('display','none')
+            } 
+            <div style={{left:'50%',top:'50%',position:'fixed'}}>
+              <Spinner color="light" style={{ width: '10rem',color:"light", height: '10rem' }} />{' '}
+            </div>
             </div>): null}
             <br/>
             <div class="row justify-content-md-center">
              {this.state.picbox == true && this.state.wait == false ? (
                <div style={{width:"100%"}}>
                 {
-                document.getElementsByTagName('nav')[0].style.setProperty('display','none'),
-                document.getElementsByClassName('test')[0].style.setProperty('display','none')
+                document.getElementsByTagName('nav')[0].style.setProperty('display','none')
+                //document.getElementsByClassName('test')[0].style.setProperty('display','none')
                 }  
                 <div class="row justify-content-md-center">
                   <div id="buttonleft">
-                   <Button color="dark" onClick={()=>this.poll()}> <FontAwesomeIcon icon={faSync} /> </Button> 
+                   <Button color="dark" onClick={()=>this.poll1()}> <FontAwesomeIcon icon={faSync} /> </Button> 
                    <Button color="dark" onClick={()=>this.hide()}> <FontAwesomeIcon icon={faArrowAltCircleLeft} /> </Button> 
                    <Button color="dark"> <a style={{color:"white"}} href={"/media/picture/"+this.state.src} download><FontAwesomeIcon icon={faDownload}/></a></Button> 
                   </div>

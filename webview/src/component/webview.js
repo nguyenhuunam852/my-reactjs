@@ -3,7 +3,7 @@ import axios from "axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck,faTimes,faPlus,faTrash,faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 import { Progress,Button } from 'reactstrap';
-import styleFilter1 from './stylefilter.js';
+import Stylefilter from './stylefilter';
 import Pagination from './pagination';
 import './webview.css';
 
@@ -258,19 +258,14 @@ export default class WebView extends Component {
         {
           this.state.isdone==true ? (
             <div>  
-            <div id="buttonleft">
-                <Button style={{backgroundColor:"#4CAF50"}} onClick={()=>{this.filterlist(0)}} > <FontAwesomeIcon icon={faSyncAlt}/></Button> 
-                <Button style={{backgroundColor:"#4CAF50"}} onClick={()=>{this.filterlist(1)}}> <FontAwesomeIcon icon={faSyncAlt}/></Button> 
-                <Button style={{backgroundColor:"#4CAF50"}} onClick={()=>{this.filterlist(2)}}> <FontAwesomeIcon icon={faSyncAlt}/></Button> 
-                <Button style={{backgroundColor:"#4CAF50"}} > <FontAwesomeIcon icon={faSyncAlt}/></Button> 
-
-            </div>
+            
+            <Stylefilter setfilter={this.filterlist}/> 
+            
             </div>
           ):null
         }
-        <styleFilter1 setfilter={this.filterlist} />
 
-        <br/>   
+        <br/> 
           <table className="containTable">
             <tr>
             <th>Pages</th>
