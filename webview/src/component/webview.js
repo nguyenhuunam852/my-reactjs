@@ -2,8 +2,11 @@ import React, { Component } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck,faTimes,faPlus,faTrash,faSyncAlt } from '@fortawesome/free-solid-svg-icons';
-import { Progress } from 'reactstrap';
-import Pagination from './pagination'
+import { Progress,Button } from 'reactstrap';
+import styleFilter1 from './stylefilter.js';
+import Pagination from './pagination';
+import './webview.css';
+
 export default class WebView extends Component {
   constructor(props) {
         super(props);
@@ -18,6 +21,7 @@ export default class WebView extends Component {
           isdone:false,
           working:'',
           pending:false,
+          task:0,
           interval:
             setInterval(()=>{
             this.poll()
@@ -39,10 +43,11 @@ export default class WebView extends Component {
   refreshList = () => {
     console.log(this.state.pagination)
     axios
-      .get("/get_view/"+this.getAllUrlParams().id+"?pagi="+this.state.pagination)
-      .then(res => this.setState({ PageList:res.data.items,sumofpages:res.data.sumofpages,isdone:res.data.isdone,working:res.data.state},()=>{
+      .get("/get_view/"+this.getAllUrlParams().id+"?pagi=1&task="+this.state.task)
+      .then(res => this.setState({ PageList:res.data.items,sumofpages:res.data.sumofpages,isdone:res.data.isdone,pagination:1,working:res.data.state},()=>{
         if(this.state.isdone)
         {
+          console.log(this.state.PageList)
           if(this.state.working.trim()==='n-active')
           {
            this.setState({active:false})
@@ -53,7 +58,7 @@ export default class WebView extends Component {
         else
         {
           console.log(res.data.signal)
-            if(res.data.signal!='Pending' && res.data.signal!='Wait')
+           if(res.data.signal!='Pending' && res.data.signal!='Wait')
            {
             console.log('wtf')
              this.setState({active:true,current:res.data.process_percent,page:res.data.current_web,pending:false}) 
@@ -145,12 +150,12 @@ export default class WebView extends Component {
         if(res.data.signal==='done')
         {
           alert('your task is done');
-          this.refreshList();
+          this.poll();
         }
         else
         {
           alert('something when wrong');
-          this.refreshList();
+          this.poll();
         }
     }).catch(err => console.log(err));
   }
@@ -162,7 +167,8 @@ export default class WebView extends Component {
       axios
       .post("/poll_state",{
         pagination: this.state.pagination,
-        idDomain:this.getAllUrlParams().id
+        idDomain:this.getAllUrlParams().id,
+        task:this.state.task
       },{
         headers: {
         'X-CSRFTOKEN': csrftoken
@@ -216,6 +222,11 @@ export default class WebView extends Component {
     console.log(clickValue);
     this.setState({pagination:clickValue},this.poll);
   }
+  filterlist=(task)=>{
+    this.setState({task:task},()=>{
+      this.refreshList()
+    })
+  }
  
   render(){
       return (
@@ -231,7 +242,6 @@ export default class WebView extends Component {
         </div>):(
           <div>
           {
-            console.log(this.state.pending),
             this.state.pending==false ?(
             <div>
               
@@ -243,20 +253,38 @@ export default class WebView extends Component {
           </div>
         )
         }
-        <table className="containTable">
-           <tr>
-           <th>Pages</th>
-           <th>State</th>
-           <th>Buttons</th>
-          </tr>
-          {this.renderItems()}
-        </table> 
+       
+        <br/>        
         {
-          this.state.sumofpages!=0 ?(
-              <Pagination items={[]} current={this.state.pagination} sumofpages={this.state.sumofpages} changepagefunc={this.changepage}/>
+          this.state.isdone==true ? (
+            <div>  
+            <div id="buttonleft">
+                <Button style={{backgroundColor:"#4CAF50"}} onClick={()=>{this.filterlist(0)}} > <FontAwesomeIcon icon={faSyncAlt}/></Button> 
+                <Button style={{backgroundColor:"#4CAF50"}} onClick={()=>{this.filterlist(1)}}> <FontAwesomeIcon icon={faSyncAlt}/></Button> 
+                <Button style={{backgroundColor:"#4CAF50"}} onClick={()=>{this.filterlist(2)}}> <FontAwesomeIcon icon={faSyncAlt}/></Button> 
+                <Button style={{backgroundColor:"#4CAF50"}} > <FontAwesomeIcon icon={faSyncAlt}/></Button> 
+
+            </div>
+            </div>
           ):null
-        }   
-      </div> 
+        }
+        <styleFilter1 setfilter={this.filterlist} />
+
+        <br/>   
+          <table className="containTable">
+            <tr>
+            <th>Pages</th>
+            <th>State</th>
+            <th>Buttons</th>
+           </tr>
+           {this.renderItems()}
+          </table> 
+          {
+           this.state.sumofpages!=0 ?(
+               <Pagination items={[]} current={this.state.pagination} sumofpages={this.state.sumofpages} changepagefunc={this.changepage}/>
+           ):null
+          }   
+         </div>
       )
   }
 }
