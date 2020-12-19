@@ -22,6 +22,8 @@ export default class WebView extends Component {
           working:'',
           pending:false,
           task:0,
+          sumofitems:0,
+          tempagination:1,
           interval:
             setInterval(()=>{
             this.poll()
@@ -34,30 +36,24 @@ export default class WebView extends Component {
     this.refreshList();
   }
   changepage=(i)=>{
-    this.setState({pagination:i},()=>{
-      console.log(this.state.pagination)
-      this.poll()
-     }
-    )
+    this.setState({tempagination:i},()=>{this.poll()
+    })
   }
   refreshList = () => {
-    console.log(this.state.pagination)
     axios
       .get("/get_view/"+this.getAllUrlParams().id+"?pagi=1&task="+this.state.task)
       .then(res => this.setState({ PageList:res.data.items,sumofpages:res.data.sumofpages,isdone:res.data.isdone,pagination:1,working:res.data.state},()=>{
         if(this.state.isdone)
         {
-          console.log(this.state.PageList)
           if(this.state.working.trim()==='n-active')
           {
+           this.setState({sumofitems:res.data.sumofitems})
            this.setState({active:false})
            this.StopPoll()
-          }
-          
+          } 
         }
         else
         {
-          console.log(res.data.signal)
            if(res.data.signal!='Pending' && res.data.signal!='Wait')
            {
             console.log('wtf')
@@ -66,7 +62,6 @@ export default class WebView extends Component {
            if(res.data.signal=='Pending'){
             this.setState({pending:true});
            }  
-
         }
       }))
       .catch(err => console.log(err));
@@ -124,7 +119,9 @@ export default class WebView extends Component {
         {
           item.is_valid == true ? (
           <div>
-          <a className="stylebutton button" href={"/words?id=" + item.id}> <FontAwesomeIcon icon={faPlus} /></a>
+          {item.amountofwords>0 ? (
+            <a className="stylebutton button" href={"/words?id=" + item.id}> <FontAwesomeIcon icon={faPlus} /></a>
+          ):null}
           <a className="stylebutton1 button" href={"/words/" + item.id}> <FontAwesomeIcon icon={faTrash} /></a>
           </div> 
           ):(
@@ -166,7 +163,7 @@ export default class WebView extends Component {
       var csrftoken = this.getCookie('csrftoken');
       axios
       .post("/poll_state",{
-        pagination: this.state.pagination,
+        pagination: this.state.tempagination,
         idDomain:this.getAllUrlParams().id,
         task:this.state.task
       },{
@@ -175,7 +172,7 @@ export default class WebView extends Component {
           }
         }
       ).then(res => {
-        this.setState({PageList:res.data.items,sumofpages:res.data.sumofpages,isdone:res.data.isdone,working:res.data.state},()=>{
+        this.setState({pagination:this.state.tempagination,PageList:res.data.items,sumofpages:res.data.sumofpages,isdone:res.data.isdone,working:res.data.state},()=>{
           if(this.state.isdone)
           {
             if(this.state.working==='n-active')
@@ -262,10 +259,13 @@ export default class WebView extends Component {
             <Stylefilter setfilter={this.filterlist}/> 
             
             </div>
+            
           ):null
         }
-
+ 
         <br/> 
+          <h5>Amount of Webpage:{this.state.sumofitems}</h5>
+          <br/>
           <table className="containTable">
             <tr>
             <th>Pages</th>
@@ -274,6 +274,7 @@ export default class WebView extends Component {
            </tr>
            {this.renderItems()}
           </table> 
+          <br/>
           {
            this.state.sumofpages!=0 ?(
                <Pagination items={[]} current={this.state.pagination} sumofpages={this.state.sumofpages} changepagefunc={this.changepage}/>

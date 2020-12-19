@@ -30,6 +30,18 @@ export default class Stylefilter extends Component{
                        <span property="name">All fail scanned webpage</span>
                     </a>
                 </li>
+
+                <li>
+                    <a className="breadcrumb" onClick={()=>this.props.setfilter(3)}>
+                       <span property="name">All webpage have wrong words</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a className="breadcrumb" onClick={()=>this.props.setfilter(4)}>
+                       <span property="name">All perfect webpage</span>
+                    </a>
+                </li>
             </ol>
             </nav>
           </div>
