@@ -6,7 +6,7 @@ import Modal from './myModal'
 import {Button,Spinner} from 'reactstrap'
 import PictureZoomBox from './picture_zoom'
 import Pagination from './pagination'
-
+import './wordform.css';
 export default class WordForm extends Component {
     constructor(props) {
         super(props);
@@ -36,38 +36,18 @@ export default class WordForm extends Component {
     }
     refreshList = () => {
       axios
-        .get("/get_words/"+this.getAllUrlParams().id+"?page="+this.state.pagination)
+        .get("/get_words/"+this.props.id+"?page="+this.state.pagination+"&iduser="+this.props.iduser)
         .then(res => this.setState({ WordList: res.data.items,sumofpages:res.data.sum }))
         .catch(err => console.log(err));
     };
-    ignore=(item)=>{
-      var csrftoken = this.getCookie('csrftoken');
-      axios
-      .post("/personal",{
-         id:item.id
-      },{
-        headers: {
-        'X-CSRFTOKEN': csrftoken
-        }
-        }
-      )
-        .then(res => {
-            if(res.data=="success")
-            {
-              alert('Your Task is Done')
-              this.refreshList();
-            }
-          }
-         )
-        .catch(err => console.log(err));
-    }
     poll = () => {
       var csrftoken = this.getCookie('csrftoken');
       console.log('wait');
       this.setState({wait:true},()=>{
         axios
         .post("/analyze_pic",{
-           idpage:this.getAllUrlParams().id
+           idpage:this.props.id,
+           iduser:this.props.iduser
         },{
           headers: {
           'X-CSRFTOKEN': csrftoken
@@ -91,35 +71,6 @@ export default class WordForm extends Component {
           })
           .catch(err => console.log(err))})
       }
-      poll1 = () => {
-        var csrftoken = this.getCookie('csrftoken');
-        this.setState({src:'',picbox:false,wait:true},()=>{
-          axios
-          .post("/analyze_pic_again",{
-             idpage:this.getAllUrlParams().id
-          },{
-            headers: {
-            'X-CSRFTOKEN': csrftoken
-            }
-            }
-          )
-            .then(res => {
-               this.setState({size:res.data.size},()=>{
-                 if(this.state.src!="fail.jpeg")
-                 { 
-                  this.setState({picbox:true,wait:false,src:res.data.pic})
-                 
-                 }
-                 else
-                 {
-                   alert("This Website can't be capture");
-                   this.setState({picbox:false,wait:false})
-                 }
-               })
-             
-            })
-            .catch(err => console.log(err))})
-        }
     hide=()=>{
       this.setState({picbox:false})
     }
@@ -151,10 +102,7 @@ export default class WordForm extends Component {
     closemodal = () =>{
       this.setState({modal:false})
     }
-    download = ()=>{
-      window.location.href="/media/picture/"+this.state.src;
-    }
-    
+   
     renderItems = () => {
             return this.state.WordList.map(item=>(
               <tr>
@@ -166,9 +114,6 @@ export default class WordForm extends Component {
                 <button className="btn btn-secondary mr-2 Buttonstyle" onClick={() => this.openmodal(item)}>
                   <FontAwesomeIcon icon={faCode} />
                 </button> 
-                <button className="btn btn-secondary mr-2 Buttonstyle" onClick={() => this.ignore(item)}> 
-                  <FontAwesomeIcon icon={faTimes} /> 
-                 </button > 
                 </td>
               </tr>
               )
@@ -179,7 +124,6 @@ export default class WordForm extends Component {
     }
     changepage=(i)=>{
       this.setState({pagination:i},()=>{
-       console.log(this.state.pagination)
        this.refreshList()
        }
       )
@@ -188,7 +132,6 @@ export default class WordForm extends Component {
     render()
     {
       document.getElementsByTagName('nav')[0].style.display='flex';
-      //document.getElementsByClassName('test')[0].style.display='block';
       return (
         
         <main className={this.state.wait==true || this.state.picbox==true  ? "blackform mainForm":"whiteform mainForm"}>
@@ -196,7 +139,6 @@ export default class WordForm extends Component {
             <div>
             {
                 document.getElementsByTagName('nav')[0].style.setProperty('display','none')
-                //document.getElementsByClassName('test')[0].style.setProperty('display','none')
             } 
             <div style={{left:'50%',top:'50%',position:'fixed'}}>
               <Spinner color="light" style={{ width: '10rem',color:"light", height: '10rem' }} />{' '}
@@ -212,9 +154,7 @@ export default class WordForm extends Component {
                 }  
                 <div class="row justify-content-md-center">
                   <div id="buttonleft">
-                   <Button color="dark" onClick={()=>this.poll1()}> <FontAwesomeIcon icon={faSync} /> </Button> 
                    <Button color="dark" onClick={()=>this.hide()}> <FontAwesomeIcon icon={faArrowAltCircleLeft} /> </Button> 
-                   <Button color="dark"> <a style={{color:"white"}} href={"/media/picture/"+this.state.src} download><FontAwesomeIcon icon={faDownload}/></a></Button> 
                   </div>
                 </div>   
                 
@@ -254,7 +194,7 @@ export default class WordForm extends Component {
              }          {
           this.state.modal == true ? (
           <Modal
-            url ={"/gethref?idurl="+this.getAllUrlParams().id+"&idword="+this.state.activeItem.id}
+            url ={"/gethref?idurl="+this.props.id+"&idword="+this.state.activeItem.id}
             toggle = {this.closemodal}
           />
           ) : null

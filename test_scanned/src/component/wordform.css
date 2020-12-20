@@ -1,0 +1,24 @@
+td .Buttonstyle{
+    width: 10%;
+    height: 10%;
+    font-size: 0.6rem;
+}
+.containTable{
+    width: 100%;
+    resize: none;
+}
+.tdword{
+    width: 38%;
+    resize: none;
+}
+.tdsuggest{
+    width: 35%;
+    resize: none;
+}
+.tdbutton{
+    width: 27%;
+    resize: none;
+}
+#buttonleft{
+    padding-left: 0px;
+}

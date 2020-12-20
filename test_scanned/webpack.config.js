@@ -3,7 +3,7 @@ const webpack = require('webpack')
 module.exports = { 
   entry: './src/index.js',
   output: {
-    path: __dirname+'/../../../Desktop/pythonproject/urlpage/static/reactjs/',
+    path: __dirname+'/../../pythonproject/urlpage/static/reactjs/',
     filename: 'testscanned.bundle.js'
   },  
   module: {
