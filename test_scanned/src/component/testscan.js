@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { Modal,Button,Spinner } from "reactstrap";
+import { Button,Spinner } from "reactstrap";
 import './testscan.css';
-import WordForm from './wordview'
+import WordForm from './wordview';
+import Modal from './myModal';
 
 export default class TestScan extends Component {
     constructor(props) {
@@ -10,6 +11,7 @@ export default class TestScan extends Component {
         
         this.state =
         {
+            modal:false,
             webpage:"",
             email:"",
             wait:false,
@@ -23,7 +25,7 @@ export default class TestScan extends Component {
         this.handleChangeEmail = this.handleChangeEmail.bind(this);
     }
     refresh=()=>{
-        this.setState({webpage:"",email:""});
+        
     }
     handleChangeWebPage(event) {
         this.setState({  webpage: event.target.value });
@@ -47,11 +49,15 @@ export default class TestScan extends Component {
       }
         
     testscan=()=>{
+     
         var check = this.validURL(this.state.webpage);
+        console.log(check)
         if(check===true)
         {
         this.setState({wait:true},()=>{
+    
             var csrftoken = this.getCookie('csrftoken');
+            console.log(csrftoken)
             axios
               .post("/testscan", {
                 webpage:this.state.webpage,
@@ -86,6 +92,9 @@ export default class TestScan extends Component {
         }
     
     }
+    closemodal = () =>{
+      this.setState({modal:false})
+    }
     validURL= (str)=> {
         var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
           '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
@@ -95,7 +104,12 @@ export default class TestScan extends Component {
           '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
         return !!pattern.test(str);
       }
+    openmal = ()=>{
+      this.setState({modal:true});
+    }
     render(){
+        console.log('open modal '+this.state.modal)
+        console.log('open email '+this.state.email)
         return(
         <div>
          {this.state.wait==false ? (
@@ -120,9 +134,24 @@ export default class TestScan extends Component {
            ):
            (
             <div class="row justify-content-center">
-              <div style={{width:"100%"}}>
-               <WordForm id={this.state.id} iduser={this.state.iduser} />
-              </div>
+              {this.state.modal == true ?
+              (
+                <Modal
+                checkcode = {false}
+                sigin = {true}
+                gmail = {this.state.email}
+                iduser = {this.state.iduser}
+                toggle = {this.closemodal}
+                />
+              ):
+              (
+                <div> 
+                  <div style={{width:"100%"}}>
+                   <WordForm open={this.openmal} id={this.state.id} iduser={this.state.iduser} />
+                  </div>
+                </div>
+              )
+              }
             </div>
            )
            }

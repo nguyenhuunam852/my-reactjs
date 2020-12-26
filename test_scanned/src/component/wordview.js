@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCode,faTimes,faArrowAltCircleLeft,faImage,faDownload,faSync } from '@fortawesome/free-solid-svg-icons'
+import { faCode,faSignInAlt,faTimes,faArrowAltCircleLeft,faImage,faDownload,faSync } from '@fortawesome/free-solid-svg-icons'
 import Modal from './myModal'
 import {Button,Spinner} from 'reactstrap'
 import PictureZoomBox from './picture_zoom'
@@ -172,8 +172,8 @@ export default class WordForm extends Component {
            
             <div class="row justify-content-md-center">
              <div id="buttonleft">
-              
-              <Button color="success" onClick={()=>{this.wait()}}><FontAwesomeIcon icon={faImage} /> </Button> 
+              <Button color="primary" onClick={()=>this.props.open()}><FontAwesomeIcon icon={faSignInAlt}/></Button>                             
+              <Button color="success" onClick={()=>{this.wait()}}><FontAwesomeIcon icon={faImage}/> </Button> 
              </div>
             </div>   
             <br/>
@@ -194,6 +194,8 @@ export default class WordForm extends Component {
              }          {
           this.state.modal == true ? (
           <Modal
+            checkcode = {true}
+            sigin = {false}
             url ={"/gethref?idurl="+this.props.id+"&idword="+this.state.activeItem.id}
             toggle = {this.closemodal}
           />
